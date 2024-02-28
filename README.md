@@ -1,14 +1,26 @@
-# ExpNo 1 :Developing AI Agent with PEAS Description
-#### Name: HARIHARAN J
-#### Register Number:212223240047
-### AIM:
-To find the PEAS description for the given AI problem and develop an AI agent
+<h1>ExpNo 1 :Developing AI Agent with PEAS Description</h1>
+<h3>Name: HARIHARAN J</h3>
+<h3>Register Number: 212223240047</h3>
 
-### THEORY:
-#### The Vacuum Cleaner Agent:
-The Vacuum Cleaner Agent is a Python class that simulates the behavior of a basic vacuum cleaner in a two-location environment ("A" and "B"). The agent can perform four actions: move left, move right, suck dirt, and do nothing. Its state includes the current location and dirt status in each location. The agent's initial state is at location "A" with no dirt. Actions like moving and sucking dirt can change its state, and the print_status method displays the current location and dirt status. This agent provides a foundation for simple vacuum cleaner simulations and can be adapted for more complex scenarios
 
-### PEAS DESCRIPTION:
+<h3>AIM:</h3>
+
+<p>To find the PEAS description for the given AI problem and develop an AI agent.</p>
+
+
+<h3>Theory</h3>
+
+<p>Performance Measure: minimize energy consumption, maximize dirt pick up. Making this precise:
+one point for each clean square over lifetime of 1000 steps.
+
+Environment: two squares, dirt distribution unknown, assume accions are deterministic and
+environment is static (clean squares stay clean).
+
+Actuators: Left, Right, Suck, NoOp.
+
+Sensors: agent can perceive its location and whether location is dirty.</p>
+
+<h3>PEAS DESCRIPTION:</h3>
 <table>
   <tr>
     <td><strong>Agent Type</strong></td>
@@ -18,91 +30,222 @@ The Vacuum Cleaner Agent is a Python class that simulates the behavior of a basi
     <td><strong>Sensors</strong></td>
   </tr>
     <tr>
-    <td><strong>Vaccum Cleaner agent</strong></td>
-    <td><strong>Cleaning Dirt</strong></td>
-     <td><strong>Rooms,floor</strong></td>
-    <td><strong>Dirt,Cleaning</strong></td>
-    <td><strong>Location,Sensing Dirt</strong></td>
+    <td><strong>Vaccum Cleaner</strong></td>
+    <td><strong>Cleanliness, Number of Movements</strong></td>
+     <td><strong>Rooms, Dust</strong></td>
+    <td><strong>Steering, Cleanliness</strong></td>
+    <td><strong>Location, Motion</strong></td>
   </tr>
 </table>
 
-### DESIGN STEPS:
-#### STEP 1: Identifying the input
-   Location
-#### STEP 2: Identifying the output:
-   move_left:  Moves the agent to the left if it is currently at location "B.".<br>
-   move_right: Moves the agent to the right if it is currently at location "A."<br>
-   suck_dirt:  Sucks dirt in the current location if there is dirt present.After sucking dirt, status in that location is updated to indicate cleanliness.<br>
-   do_nothing: Represents a passive action where the agent remains idle.
-#### STEP 3: Developing the PEAS description:
-   PEAS description is developed by the performance, environment, actuators, and sensors in an agent.
-#### STEP 4: Implementing the AI agent:
-   Clean the room and Search for dirt and Suck it.
+## DESIGN STEPS
+### STEP 1:
+Identifying the input:
+### STEP 2:
+Identifying the output:
+### STEP 3:
+Developing the PEAS description:
+### STEP 4:
+Implementing the AI agent
+### STEP 5:
+Measure the performance parameters
 
-### PROGRAM:
+## PROGRAM
 ```
-Developing AI Agent with PEAS Description
-Developed by: HARIHARAN J
-RegisterNumber: 212223240047
+import random
+class Thing:
+    """
+    This represents any physical object that can appear in an Environment.
+    """
+    def is_alive(self):
+        """Things that are 'alive' should return true."""
+        return hasattr(self, 'alive') and self.alive
+    
+    def show_state(self):
+        """Display the agent's internal state. Subclasses should override."""
+        print("I don't know how to show_state.")
 
-class VacuumCleanerAgent:
+class Agent(Thing):
+    """
+    An Agent is a subclass of Thing
+    """
+    def __init__(self, program=None):
+        self.alive = True
+        self.performance = 0
+        self.program = program
+    
+    def can_grab(self, thing):
+        """Return True if this agent can grab this thing.
+        Override for appropriate subclasses of Agent and Thing."""
+        return False
+
+def TableDrivenAgentProgram(table):
+    """
+    [Figure 2.7]
+    This agent selects an action based on the percept sequence.
+    It is practical only for tiny domains.
+    To customize it, provide as table a dictionary of all
+    {percept_sequence:action} pairs.
+    """
+    percepts = []
+    
+    def program(percept):
+        action = None
+        percepts.append(percept)
+        action = table.get(tuple(percepts))
+        return action
+    
+    return program
+
+loc_A, loc_B = (0, 0), (1, 0) # The two locations for the Vacuum world
+
+def TableDrivenVacuumAgent():
+    """
+    Tabular approach towards vacuum world
+    """
+    table = {
+        ((loc_A, 'Clean'),): 'Right',
+        ((loc_A, 'Dirty'),): 'Suck',
+        ((loc_B, 'Clean'),): 'Left',
+        ((loc_B, 'Dirty'),): 'Suck',
+        ((loc_A, 'Dirty'), (loc_A, 'Clean')): 'Right',
+        ((loc_A, 'Clean'), (loc_B, 'Dirty')): 'Suck',
+        ((loc_B, 'Clean'), (loc_A, 'Dirty')): 'Suck',
+        ((loc_B, 'Dirty'), (loc_B, 'Clean')): 'Left',
+        ((loc_A, 'Dirty'), (loc_A, 'Clean'), (loc_B, 'Dirty')): 'Suck',
+        ((loc_B, 'Dirty'), (loc_B, 'Clean'), (loc_A, 'Dirty')): 'Suck'
+    }
+    return Agent(TableDrivenAgentProgram(table))
+
+class Environment:
+    """Abstract class representing an Environment. 'Real' Environment classes
+    inherit from this. Your Environment will typically need to implement:
+    percept: Define the percept that an agent sees.
+    execute_action: Define the effects of executing an action.
+    Also update the agent.performance slot.
+    The environment keeps a list of .things and .agents (which is a subset
+    of .things). Each agent has a .performance slot, initialized to 0.
+    Each thing has a .location slot, even though some environments may not
+    need this."""
     def __init__(self):
-        # Initialize the agent's state (location and dirt status)
-        self.location = "A"  # Initial location (can be "A" or "B")
-        self.dirt_status = {"A": False, "B": False}  # Initial dirt status (False means no dirt)
-
-    def move_left(self):
-        # Move the agent to the left if possible
-        if self.location == "B":
-            self.location = "A"
-
-    def move_right(self):
-        # Move the agent to the right if possible
-        if self.location == "A":
-            self.location = "B"
-
-    def suck_dirt(self):
-        # Suck dirt in the current location if there is dirt
-        if self.dirt_status[self.location]:
-            self.dirt_status[self.location] = False
-            print(f"Sucked dirt in location {self.location}")
-
-    def do_nothing(self):
-        # Do nothing
-        pass
-
-    def perform_action(self, action):
-        # Perform the specified action
-        if action == "left":
-            self.move_left()
-        elif action == "right":
-            self.move_right()
-        elif action == "suck":
-            self.suck_dirt()
-        elif action == "nothing":
-            self.do_nothing()
+        self.things = []
+        self.agents = []
+    
+    def percept(self, agent):
+        """Return the percept that the agent sees at this point. (Implement this.)"""
+        raise NotImplementedError
+    
+    def execute_action(self, agent, action):
+        """Change the world to reflect this action. (Implement this.)"""
+        raise NotImplementedError
+    
+    def default_location(self, thing):
+        """Default location to place a new thing with unspecified location."""
+        return None
+    
+    def is_done(self):
+        """By default, we're done when we can't find a live agent."""
+        return not any(agent.is_alive() for agent in self.agents)
+    
+    def step(self):
+        """Run the environment for one time step. If the
+        actions and exogenous changes are independent, this method will
+        do. If there are interactions between them, you'll need to
+        override this method."""
+        if not self.is_done():
+            actions = []
+            for agent in self.agents:
+                if agent.alive:
+                    actions.append(agent.program(self.percept(agent)))
+                else:
+                    actions.append("")
+            for (agent, action) in zip(self.agents, actions):
+                self.execute_action(agent, action)
+    
+    def run(self, steps=1000):
+        """Run the Environment for given number of time steps."""
+        for step in range(steps):
+            if self.is_done():
+                return
+            self.step()
+    
+    def add_thing(self, thing, location=None):
+        """Add a thing to the environment, setting its location. For
+        convenience, if thing is an agent program we make a new agent
+        for it. (Shouldn't need to override this.)"""
+        if not isinstance(thing, Thing):
+            thing = Agent(thing)
+        if thing in self.things:
+            print("Can't add the same thing twice")
         else:
-            print("Invalid action")
+            thing.location = location if location is not None else self.default_location(thing)
+            self.things.append(thing)
+            if isinstance(thing, Agent):
+                thing.performance = 0
+                self.agents.append(thing)
+    
+    def delete_thing(self, thing):
+        """Remove a thing from the environment."""
+        try:
+            self.things.remove(thing)
+        except ValueError as e:
+            print(e)
+            print(" in Environment delete_thing")
+            print(" Thing to be removed: {} at {}".format(thing, thing.location))
+            print(" from list: {}".format([(thing, thing.location) for thing in self.things]))
+        if thing in self.agents:
+            self.agents.remove(thing)
 
-    def print_status(self):
-        # Print the current status of the agent
-        print(f"Location: {self.location}, Dirt Status: {self.dirt_status}")
+class TrivialVacuumEnvironment(Environment):
+    """This environment has two locations, A and B. Each can be Dirty
+    or Clean. The agent perceives its location and the location's
+    status. This serves as an example of how to implement a simple
+    Environment."""
+    def __init__(self):
+        super().__init__()
+        self.status = {
+            loc_A: random.choice(['Clean', 'Dirty']),
+            loc_B: random.choice(['Clean', 'Dirty'])
+        }
+    
+    def thing_classes(self):
+        return [TableDrivenVacuumAgent]
+    
+    def percept(self, agent):
+        """Returns the agent's location, and the location status (Dirty/Clean)."""
+        return agent.location, self.status[agent.location]
+    
+    def execute_action(self, agent, action):
+        """Change agent's location and/or location's status; track performance.
+        Score 10 for each dirt cleaned; -1 for each move."""
+        if action == 'Right':
+            agent.location = loc_B
+            agent.performance -= 1
+        elif action == 'Left':
+            agent.location = loc_A
+            agent.performance -= 1
+        elif action == 'Suck':
+            if self.status[agent.location] == 'Dirty':
+                agent.performance += 10
+                self.status[agent.location] = 'Clean'
+    
+    def default_location(self, thing):
+        """Agents start in either location at random."""
+        return random.choice([loc_A, loc_B])
 
-# Example usage:
-agent = VacuumCleanerAgent()
-
-# Move the agent, suck dirt, and do nothing
-
-agent.perform_action("left")
-agent.print_status()
-agent.perform_action("suck")
-agent.print_status()
-agent.perform_action("nothing")
-agent.print_status()
+if __name__ == "__main__":
+    agent = TableDrivenVacuumAgent()
+    environment = TrivialVacuumEnvironment()
+    environment.add_thing(agent)
+    print(environment.status)
+    environment.run(steps=10)
+    print(environment.status)
+    print(agent.performance)
 ```
-### OUTPUT:
-![Exp 1 PEAS ](https://github.com/Vikaash19/19AI405ExpNo1/assets/148514589/30c5f376-305a-4f9f-be83-0af5586b22f4)
+# OUTPUT
+![image](https://github.com/SridharShyam/19AI405ExpNo1/assets/144871368/274bc8d3-9226-4f85-8441-d0f3516e2ffe)
 
-### RESULT:
-Thus the Developing AI Agent with PEAS Description was implemented  using
-python programming.
+
+# RESULT
+Thus, an AI agent is developed.
+
