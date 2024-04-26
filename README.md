@@ -2,14 +2,10 @@
 <h3>Name: HARIHARAN J</h3>
 <h3>Register Number: 212223240047</h3>
 
-
 <h3>AIM:</h3>
-
 <p>To find the PEAS description for the given AI problem and develop an AI agent.</p>
 
-
 <h3>Theory</h3>
-
 <p>Performance Measure: minimize energy consumption, maximize dirt pick up. Making this precise:
 one point for each clean square over lifetime of 1000 steps.
 
@@ -40,11 +36,11 @@ Sensors: agent can perceive its location and whether location is dirty.</p>
 
 ## DESIGN STEPS
 ### STEP 1:
-Identifying the input:
+Identifying the input
 ### STEP 2:
-Identifying the output:
+Identifying the output
 ### STEP 3:
-Developing the PEAS description:
+Developing the PEAS description
 ### STEP 4:
 Implementing the AI agent
 ### STEP 5:
